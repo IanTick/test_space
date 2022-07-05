@@ -1,0 +1,40 @@
+use num_primes::{self, BigUint};
+
+
+#[derive(Debug)]
+struct Calculation{
+    all: Vec<(BigUint, BigUint, BigUint)>,
+    ratios: Vec<BigUint>,
+}
+
+impl Calculation{
+    fn iteration(&mut self, bits: usize){
+        let triple = gen_triple(bits);
+        let prod = triple.0.clone()*triple.1.clone();
+        self.ratios.push((/*BigUint::new(vec![2])**/prod)/triple.2.clone());
+        self.all.push(triple);
+    }
+
+    fn dump_ratios(&self){
+        dbg!(&self.ratios);
+    }
+}
+
+fn main() {
+    let mut calc = Calculation{
+        all: Vec::new(),
+        ratios: Vec::new(),
+    };
+    for bits in 1024..1080usize{
+        calc.iteration(bits);
+        calc.iteration(bits);
+    }
+    calc.dump_ratios();
+}
+
+fn gen_triple(bits: usize)->(BigUint, BigUint, BigUint){
+    let first = num_primes::Generator::new_prime(bits);
+    let second = num_primes::Generator::new_prime(bits);
+    let num_coprimes = (first.clone()-BigUint::new(vec![1]))*(second.clone()-BigUint::new(vec![1]));
+    (first, second, num_coprimes)
+}
